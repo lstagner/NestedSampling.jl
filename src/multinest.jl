@@ -14,7 +14,7 @@ function multinest_dumper(nsamples_::Ptr{Cint},
                           logZ_::Ptr{Cdouble},
                           insLogZ_::Ptr{Cdouble},
                           logZerr_::Ptr{Cdouble},
-                          nested_::Ptr{Void})
+                          nested_::Ptr{Nothing})
 
     nsamples = unsafe_load(nsamples_)
     nlive = unsafe_load(nlive_)
@@ -98,7 +98,7 @@ end
 
 function multinest_loglike(cube_::Ptr{Cdouble}, ndim_::Ptr{Cint},
                            npar_::Ptr{Cint}, lnew_::Ptr{Cdouble},
-                           nested_::Ptr{Void})
+                           nested_::Ptr{Nothing})
     ndim = unsafe_load(ndim_)
     npar = unsafe_load(npar_)
     cube = unsafe_wrap(Array, cube_, npar)
@@ -108,25 +108,25 @@ function multinest_loglike(cube_::Ptr{Cdouble}, ndim_::Ptr{Cint},
     return
 end
 
-function run(S::MultiNest; nlive::Int=25*S.ndims, ztol=0.1, resume=true, verbosity=0)
+function run(S::MultiNest; nlive::Int=25*S.ndims, ztol=0.1, resume=false, verbosity=0)
 
-    loglike = cfunction(multinest_loglike, Void, (Ptr{Cdouble}, Ptr{Cint}, Ptr{Cint}, Ptr{Cdouble}, Ptr{Void}))
+    loglike = @cfunction(multinest_loglike, Nothing, (Ptr{Cdouble}, Ptr{Cint}, Ptr{Cint}, Ptr{Cdouble}, Ptr{Nothing}))
 
-    dumper = cfunction(multinest_dumper, Void, (Ptr{Cint}, Ptr{Cint}, Ptr{Cint},
+    dumper = @cfunction(multinest_dumper, Nothing, (Ptr{Cint}, Ptr{Cint}, Ptr{Cint},
                                          Ptr{Ptr{Cdouble}}, Ptr{Ptr{Cdouble}},
                                          Ptr{Ptr{Cdouble}}, Ptr{Cdouble},
                                          Ptr{Cdouble}, Ptr{Cdouble},Ptr{Cdouble},
-                                         Ptr{Void}))
+                                         Ptr{Nothing}))
 
     root_dir = dirname(S.root)
     println(root_dir)
     isdir(root_dir) || mkdir(root_dir)
 
-    ccall(multinest_ptr, Void, ( Ref{Cint}, Ref{Cint}, Ref{Cint},
+    ccall(multinest_ptr, Nothing, ( Ref{Cint}, Ref{Cint}, Ref{Cint},
           Ref{Cint}, Ref{Cdouble}, Ref{Cdouble}, Ref{Cint}, Ref{Cint},
           Ref{Cint}, Ref{Cint}, Ref{Cint}, Ref{Cdouble}, Ptr{UInt8},
           Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ref{Cint}, Ref{Cint}, Ref{Cint},
-          Ref{Cdouble}, Ref{Cint}, Ptr{Void}, Ptr{Void}, Any ),
+          Ref{Cdouble}, Ref{Cint}, Ptr{Nothing}, Ptr{Nothing}, Any ),
           S.ins, S.mmodal, S.ceff, nlive, ztol, S.efr,
           S.ndims, S.npar, S.nclspar, S.maxmodes, S.updint, S.mode_ztol,
           S.root, S.seed, S.pwrap, verbosity, resume, S.outfile, S.initmpi,

@@ -1,6 +1,6 @@
-The MultimodalNestedSampling.jl package is licensed under the MIT "Expat" License:
+The NestedSampling.jl package is licensed under the MIT "Expat" License:
 
-> Copyright (c) 2017: Luke Stagner
+> Copyright (c) 2018: Luke Stagner
 .
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy

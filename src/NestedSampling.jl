@@ -1,4 +1,4 @@
-module MultimodalNestedSampling
+module NestedSampling
 
 using Libdl
 
